@@ -3,6 +3,7 @@ import entities.Record;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 
+
 public class Main {
     public static void main(String[] args) {
 
@@ -16,12 +17,14 @@ public class Main {
 
         System.out.println("Time single queries : " + durationSingleQueries + "ms");
         System.out.println("Time batched queries: " + durationBatchQueries + "s");
+
+        PersistenceManager.INSTANCE.close();
     }
 
     /**
      * Used to divide the timer from nanoseconds to seconds
      */
-    private static final int timeDivider = 1000000000;
+    private static final long timeDivider = 1000000000;
 
     public long runTimedSingleQueries(int records) {
         long startTime = System.nanoTime();
@@ -52,6 +55,8 @@ public class Main {
             entityManager.persist(record);
             entityTransaction.commit();
         }
+        entityManager.clear();
+        entityManager.close();
     }
 
     private void runBatchQuery(int records, int batchSize) {
@@ -81,8 +86,8 @@ public class Main {
             }
             throw e;
         } finally {
+            entityManager.clear();
             entityManager.close();
         }
     }
-
 }
